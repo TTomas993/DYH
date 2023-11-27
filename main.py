@@ -1,8 +1,6 @@
 import sys
-
-import PyQt5.QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QGridLayout, \
-    QHBoxLayout
+    QHBoxLayout, QMenuBar, QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QImage, QPixmap, QFont
 
@@ -11,23 +9,13 @@ class OtthontervezoAblak(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        # Menüsor inicializálása
+        self.menuSor_keszitese()
+
         # Ablak beállításai
         self.setWindowTitle('DYH!')
+        self.setWindowIcon(QIcon("Icon.png"))
         self.setGeometry(100, 100, 800, 600)
-
-        # Menüsor felépítésa
-        menu=self.menuBar()
-        file_menu=menu.addMenu("File")
-        open=file_menu.addAction("Megnyitás")
-        open.triggered.connect(self.open)
-        last_opened=file_menu.addMenu("Utoljára megnyitott")
-        last_opened.triggered.connect(self.lastOpen)
-
-        menu.addMenu("Edit")
-        menu.addMenu("View")
-        menu.addMenu("Help")
-
-
 
         # Fő tartalom elhelyezése
         tartalom_widget = QWidget()
@@ -38,53 +26,93 @@ class OtthontervezoAblak(QMainWindow):
         foCim_meret=QFont()
         foCim_meret.setPointSize(60)
         foCim.setFont(foCim_meret)
-        foCim.setAlignment(Qt.AlignCenter)
+        foCim.setAlignment(Qt.AlignHCenter)
         tartalom_elrendezes.addWidget(foCim,0,0,0,3)
 
         # Funkció ikonok megjelenítése
         uj_terv_label=QLabel(self)
         uj_terv_kep=QPixmap("newPlan.png")
         uj_terv_label.setPixmap(uj_terv_kep)
-        uj_terv_label.setAlignment(Qt.AlignCenter)
-        tartalom_elrendezes.addWidget(uj_terv_label, 2,0)
+        uj_terv_label.setAlignment(Qt.AlignHCenter)
+        tartalom_elrendezes.addWidget(uj_terv_label, 1,0)
         uj_terv_label.mousePressEvent = self.ujTerv
 
         megnyitas_label = QLabel(self)
         megnyitas_kep = QPixmap("open.png")
         megnyitas_label.setPixmap(megnyitas_kep)
-        megnyitas_label.setAlignment(Qt.AlignCenter)
-        tartalom_elrendezes.addWidget(megnyitas_label, 2,1)
+        megnyitas_label.setAlignment(Qt.AlignHCenter)
+        tartalom_elrendezes.addWidget(megnyitas_label, 1,1)
         megnyitas_label.mousePressEvent = self.open
 
         export_label = QLabel(self)
         export_kep = QPixmap("export.png")
         export_label.setPixmap(export_kep)
-        export_label.setAlignment(Qt.AlignCenter)
-        tartalom_elrendezes.addWidget(export_label, 2, 2)
+        export_label.setAlignment(Qt.AlignHCenter)
+        tartalom_elrendezes.addWidget(export_label, 1, 2)
         export_label.mousePressEvent = self.export
 
-
-        #tartalom_elrendezes.addWidget(ikonok_elrendezese)
-        """
-        layout=QGridLayout(self)
-        layout.addWidget(uj_terv_label, 10, 5)
-        layout.addWidget(megnyitas_label, 0, 1)
-
-        layout.setAlignment(Qt.AlignCenter)
-        """
-        """
-        gomb = QPushButton('Nyitás')
-        gomb.clicked.connect(self.nyit_alkalmazas)
-        tartalom_elrendezes.addWidget(gomb)
-        """
         self.setCentralWidget(tartalom_widget)
 
-    def open(self, event):
-        if event.button() == Qt.LeftButton:
-            print('Az alkalmazás nyitása...')
+    def menuSor_keszitese(self):
+        # Menübár alapja
+        menuSor=QMenuBar(self)
+        self.setMenuBar(menuSor)
+        file_menu = menuSor.addMenu("Fájl")
+        edit_menu=menuSor.addMenu("Szerkesztés")
+        view_menu=menuSor.addMenu("Nézet")
+        help_menu=menuSor.addMenu("Help")
+
+        # File menu pontjai
+        open = file_menu.addAction("Megnyitás")
+        open.triggered.connect(self.menuOpen)
+        last_opened = file_menu.addAction("Utoljára megnyitott")
+        last_opened.triggered.connect(self.lastOpen)
+        file_menu.addSeparator()
+        save=file_menu.addAction("Mentés")
+        save.triggered.connect(self.save)
+        saveAs=file_menu.addAction("Mentés másként")
+        saveAs.triggered.connect(self.saveAs)
+        export=file_menu.addAction("Terv exportálása")
+        export.triggered.connect(self.export)
+        file_menu.addSeparator()
+        settings=file_menu.addAction("Beállítások")
+        settings.triggered.connect(self.settings)
+        file_menu.addSeparator()
+        exit=file_menu.addAction("Kilépés")
+        exit.triggered.connect(self.close)
+
+    # Fájl menü funkciói
+    def menuOpen(self):
+        print("Menu nyomva")
 
     def lastOpen(self):
         print("Last open")
+
+    def save(self):
+        print("Mentés katt")
+
+    def saveAs(self):
+        print("Mentés másként katt")
+
+    def export(self):
+        print("Export katt")
+
+    def settings(self):
+        print("Settings")
+
+    def closeEvent(self, event):
+        quit_msg = "Biztosan ki szeretne lépni?"
+        reply = QMessageBox.question(self, 'Figyelmeztetés', quit_msg, QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+
+    # Fő gombok
+    def open(self, event):
+        if event.button() == Qt.LeftButton:
+            print('Terv nyitása...')
 
     def ujTerv(self, event):
         if event.button() == Qt.LeftButton:
@@ -93,6 +121,8 @@ class OtthontervezoAblak(QMainWindow):
     def export(self, event):
         if event.button() == Qt.LeftButton:
             print("Export katt")
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
