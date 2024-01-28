@@ -1,13 +1,15 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QGridLayout, \
-    QHBoxLayout, QMenuBar, QMessageBox
+    QHBoxLayout, QMenuBar, QMessageBox, QFileDialog
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QImage, QPixmap, QFont
+import planner
+
 
 
 class OtthontervezoAblak(QMainWindow):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super(OtthontervezoAblak, self).__init__(parent)
 
         # Menüsor inicializálása
         self.menuSor_keszitese()
@@ -36,6 +38,7 @@ class OtthontervezoAblak(QMainWindow):
         uj_terv_label.setAlignment(Qt.AlignHCenter)
         tartalom_elrendezes.addWidget(uj_terv_label, 1,0)
         uj_terv_label.mousePressEvent = self.ujTerv
+        self.dialog = planner.Second(self)
 
         megnyitas_label = QLabel(self)
         megnyitas_kep = QPixmap("open.png")
@@ -72,8 +75,8 @@ class OtthontervezoAblak(QMainWindow):
         save.triggered.connect(self.save)
         saveAs=file_menu.addAction("Mentés másként")
         saveAs.triggered.connect(self.saveAs)
-        export=file_menu.addAction("Terv exportálása")
-        export.triggered.connect(self.export)
+        plan_export=file_menu.addAction("Terv exportálása")
+        plan_export.triggered.connect(self.plan_export)
         file_menu.addSeparator()
         settings=file_menu.addAction("Beállítások")
         settings.triggered.connect(self.settings)
@@ -97,6 +100,9 @@ class OtthontervezoAblak(QMainWindow):
     def export(self):
         print("Export katt")
 
+    def plan_export(self):
+        print("Terv Export katt")
+
     def settings(self):
         print("Settings")
 
@@ -112,11 +118,21 @@ class OtthontervezoAblak(QMainWindow):
     # Fő gombok
     def open(self, event):
         if event.button() == Qt.LeftButton:
-            print('Terv nyitása...')
+            # Tallózási ablak megnyitása
+            file_dialog = QFileDialog(self)
+            file_dialog.setNameFilter("Text files (*.txt);;All files (*.*)")
 
+            if file_dialog.exec_():
+                selected_file = file_dialog.selectedFiles()[0]
+                print(f"Kiválasztott fájl: {selected_file}")
+
+#Itt valamai nem jó, mert nem marad nyitva az új ablak
     def ujTerv(self, event):
         if event.button() == Qt.LeftButton:
             print("Új terv katt")
+            self.dialog.show()
+            OtthontervezoAblak.hide(self)
+
 
     def export(self, event):
         if event.button() == Qt.LeftButton:
